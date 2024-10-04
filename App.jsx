@@ -13,8 +13,10 @@ import {
 import React, { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const InitialScene = ({ props }: { props: any }) => {
+const InitialScene = (props) => {
   const [rotation, setRotation] = useState([-45, 50, 40]);
+  const [position, setPosition] = useState([0, 0, -5]);
+  const [scale, setScale] = useState([0.05, 0.05, 0.05]);
 
   let data = props.sceneNavigator.viroAppProps;
 
@@ -33,6 +35,34 @@ const InitialScene = ({ props }: { props: any }) => {
     },
   });
 
+  const moveObject = (newPosition) => {
+    setPosition(newPosition);
+  };
+
+  const rotateObject = (rotateState, rotationFactor, source) => {
+    if (rotateState === 3) {
+      let newRotation = [
+        rotation[0] - rotationFactor,
+        rotation[1] - rotationFactor,
+        rotation[2] - rotationFactor,
+      ];
+
+      console.log("currentRotation: ", rotation);
+      console.log("rotationFactor: ", rotationFactor);
+      setRotation(newRotation);
+    }
+  };
+
+  const scaleObject = (pinchState, scaleFactor, scaleSource) => {
+    if (pinchState === 3) {
+      let currentScale = scale[0];
+      let newScale = currentScale * scaleFactor;
+      let newScaleArray = [newScale, newScale, newScale];
+
+      setScale(newScaleArray);
+    }
+  };
+
   return (
     <ViroARScene>
       <ViroAmbientLight color={"#ffffff"} />
@@ -40,17 +70,23 @@ const InitialScene = ({ props }: { props: any }) => {
       {data.object === "skull" ? (
         <Viro3DObject
           source={require("./assets/skull/skull.obj")}
-          position={[0, 0, -5]}
-          scale={[0.05, 0.05, 0.05]}
-          rotation={[-45, 50, 40]}
+          position={position}
+          scale={scale}
+          rotation={rotation}
+          onDrag={moveObject}
+          onRotate={rotateObject}
+          onPinch={scaleObject}
           type={"OBJ"}
         />
       ) : (
         <Viro3DObject
           source={require("./assets/chair/chairss.obj")}
-          position={[0, 0, -5]}
-          scale={[0.05, 0.05, 0.05]}
-          rotation={[-45, 50, 40]}
+          position={position}
+          scale={scale}
+          rotation={rotation}
+          onDrag={moveObject}
+          onRotate={rotateObject}
+          onPinch={scaleObject}
           type={"OBJ"}
         />
       )}
